@@ -11,6 +11,7 @@ export async function POST({ url }: { url: URL }) {
 	const code = Math.floor(Math.random() * (999999 - 100000 + 1)) + 100000;
 
 	const result = await sql`SELECT * FROM groupes WHERE code = ${code}`;
+
 	// check if code is already used
 	if (result.rowCount > 0) {
 		return POST({ url });

@@ -4,6 +4,8 @@
 
 	let createGroupVisible = false;
 	let joinGroupVisible = false;
+	let registerVisible = false;
+	let loginVisible = false;
 	let groupData = '';
 
 	function createGroup(event: MouseEvent & { currentTarget: EventTarget & HTMLButtonElement }) {
@@ -35,6 +37,8 @@
 			return;
 		}
 
+		groupData = groupData.trim().replaceAll(' ', '');
+
 		// vérifie que c'est un nombre de 6 chiffres
 		if (!/^\d{6}$/.test(groupData)) {
 			toast.error("Ce groupe n'existe pas");
@@ -50,7 +54,7 @@
 			.then((res) => res.json())
 			.then((res) => {
 				if (res.exist) {
-					window.location.href = `/${res.code}`;
+					window.location.href = `/${groupData}`;
 				} else {
 					toast.error("Ce groupe n'existe pas");
 				}
@@ -61,6 +65,11 @@
 <div
 	class="h-screen w-screen bg-purple-400 p-5 text-center flex items-center justify-center relative"
 >
+	<div class="absolute top-2 md:top-8 flex justify-center gap-x-2">
+		<button on:click={() => (registerVisible = true)}>Créer un compte</button>
+		<p>•</p>
+		<button on:click={() => (loginVisible = true)}>Se connecter</button>
+	</div>
 	<div class="w-full flex justify-center items-center flex-col -mt-14 md:w-4/12">
 		<img src="salawat.png" alt="salawat" width="70%" />
 
