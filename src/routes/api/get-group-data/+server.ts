@@ -1,3 +1,4 @@
+import GroupData from '$lib/groupData';
 import { sql } from '@vercel/postgres';
 
 /** @type {import('./$types').RequestHandler} */
@@ -8,18 +9,40 @@ export async function GET({ url }: { url: URL }) {
 		);
 	}
 
-	const code = url.searchParams.get('code');
+	const code = url.searchParams.get('code')!;
+
+	const groupeData = (await sql`SELECT * FROM groupes WHERE groupes.code = ${code}`).rows[0];
 
 	const somme =
-		(await sql`SELECT SUM(nombre) FROM salawat WHERE salawat.groupe_id = ${code}`).rows[0].sum ?? 0;
+		(await sql`SELECT SUM(nombre) FROM salawat WHERE salawat.groupe_code = ${code}`).rows[0].sum ??
+		0;
 
 	const sommeAujourdhui =
 		(
-			await sql`SELECT SUM(nombre) FROM salawat WHERE salawat.groupe_id = ${code} AND DATE(salawat.date) = CURRENT_DATE`
+			await sql`SELECT SUM(nombre) FROM salawat WHERE salawat.groupe_code = ${code} AND DATE(salawat.date) = CURRENT_DATE`
 		).rows[0].sum ?? 0;
 
-	const nombreParticipants =
-		(await sql`SELECT COUNT(*) FROM salawat WHERE salawat.groupe_id = ${code}`).rows[0].count ?? 0;
+	const nombreParticipantsAujourdhui =
+		(
+			await sql`SELECT COUNT(DISTINCT user_id) FROM salawat WHERE salawat.groupe_code = ${code} AND DATE(salawat.date) = CURRENT_DATE`
+		).rows[0].count ?? 0;
 
-	return new Response(JSON.stringify({ somme: somme, sommeAujourdhui: sommeAujourdhui }));
+	const nombreParticipants = (
+		await sql`SELECT COUNT(DISTINCT user_id) FROM salawat WHERE salawat.groupe_code = ${code}`
+	).rows[0].count;
+
+	return new Response(
+		JSON.stringify(
+			new GroupData(
+				code,
+				somme,
+				sommeAujourdhui,
+				nombreParticipantsAujourdhui,
+				nombreParticipants,
+				groupeData.name,
+				groupeData.objectif_journalier,
+				groupeData.objectif_total
+			)
+		)
+	);
 }

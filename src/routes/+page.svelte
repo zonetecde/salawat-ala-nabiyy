@@ -14,6 +14,12 @@
 	let passwordConfirmation = '';
 	let isConnected = false;
 
+	let userSecretValue: string;
+
+	userId.subscribe((value) => {
+		userSecretValue = value;
+	});
+
 	onMount(() => {
 		if (localStorage.getItem('userId') && localStorage.getItem('username')) {
 			userId.set(localStorage.getItem('userId')!);
@@ -28,17 +34,22 @@
 			return;
 		}
 
-		fetch('/api/create-group?name=' + groupData, {
+		if (!userSecretValue) {
+			toast.error('Vous devez être connecté pour créer un groupe.');
+			return;
+		}
+
+		fetch('/api/create-group', {
 			method: 'POST',
 			headers: {
 				'Content-Type': 'application/json'
 			},
-			body: JSON.stringify({ groupName: groupData })
+			body: JSON.stringify({ groupName: groupData, creatorSecret: userSecretValue })
 		})
 			.then((res) => res.json())
 			.then((res) => {
 				if (res.success) {
-					window.location.href = `/${groupData}`;
+					window.location.href = `/${res.code}`;
 				} else {
 					toast.error("Une erreur s'est produite");
 				}
@@ -158,7 +169,7 @@
 </script>
 
 <div
-	class="h-screen w-screen bg-purple-400 p-5 text-center flex items-center justify-center relative"
+	class="h-screen w-screen bg-[#8faebd] p-5 text-center flex items-center justify-center relative"
 >
 	{#if !isConnected}
 		<div class="absolute top-2 md:top-8 flex justify-center gap-x-2">
@@ -183,13 +194,13 @@
 		</div>
 	{/if}
 
-	<div class="w-full flex justify-center items-center flex-col -mt-14 md:w-4/12">
+	<div class="w-full flex justify-center items-center flex-col -mt-3 md:w-4/12">
 		<img src="salawat.png" alt="salawat" width="70%" />
 
 		<p>Que la paix et la bénédiction d'Allah soient sur notre Maitre Muhammad</p>
 
 		<button
-			class="mt-5 bg-purple-700 text-white p-3 rounded-lg shadow-lg hover:bg-purple-800"
+			class="mt-5 bg-blue-700 text-white p-3 rounded-lg shadow-lg hover:bg-blue-800"
 			on:click={() => (createGroupVisible = true)}
 		>
 			Créer un groupe
@@ -198,7 +209,7 @@
 		<p class="mt-5 text-gray-700">— ou —</p>
 
 		<button
-			class="mt-5 bg-purple-700 text-white p-3 rounded-lg shadow-lg hover:bg-purple-800"
+			class="mt-5 bg-blue-700 text-white p-3 rounded-lg shadow-lg hover:bg-blue-800"
 			on:click={() => (joinGroupVisible = true)}
 		>
 			Rejoindre un groupe
@@ -211,11 +222,11 @@
 			transition:fly
 		>
 			<div
-				class="bg-purple-400 rounded-2xl border-4 border-purple-800 shadow-xl shadow-purple-400 h-3/5 lg:h-2/5 xl:h-[30%] w-11/12 md:w-8/12 lg:w-4/12 relative"
+				class="bg-blue-400 rounded-2xl border-4 border-blue-800 shadow-xl shadow-blue-400 h-3/5 lg:h-2/5 xl:h-[30%] w-11/12 md:w-8/12 lg:w-4/12 relative"
 			>
 				<div class="flex items-center justify-center p-5 flex-col h-full">
 					<button
-						class="text-3xl absolute top-2 right-2 bg-purple-900 rounded-2xl px-1 py-1 text-white hover:bg-purple-800"
+						class="text-3xl absolute top-2 right-2 bg-blue-900 rounded-2xl px-1 py-1 text-white hover:bg-blue-800"
 						on:click={() => {
 							createGroupVisible = false;
 							joinGroupVisible = false;
@@ -243,12 +254,12 @@
 								bind:value={groupData}
 								placeholder={createGroupVisible ? 'Nom du groupe' : 'Code du groupe'}
 								autocomplete="off"
-								class="w-11/12 p-3 rounded-lg border-2 border-purple-800 focus:outline-none focus:border-purple-700"
+								class="w-11/12 p-3 rounded-lg border-2 border-blue-800 focus:outline-none focus:border-blue-700"
 							/>
 						</div>
 
 						<button
-							class="my-auto bg-purple-700 text-white p-3 px-6 rounded-lg shadow-lg hover:bg-purple-800 mt-12"
+							class="my-auto bg-blue-700 text-white p-3 px-6 rounded-lg shadow-lg hover:bg-blue-800 mt-12"
 							on:click={createGroupVisible ? createGroup : joinGroup}
 						>
 							{createGroupVisible ? 'Créer' : 'Rejoindre'}
@@ -264,14 +275,14 @@
 			transition:fly
 		>
 			<div
-				class="bg-purple-400 rounded-2xl border-4 border-purple-800 shadow-xl shadow-purple-400 lg:h-3/5 w-11/12 md:w-8/12 lg:w-5/12 xl:w-4/12 relative"
+				class="bg-blue-400 rounded-2xl border-4 border-blue-800 shadow-xl shadow-blue-400 lg:h-3/5 w-11/12 md:w-8/12 lg:w-5/12 xl:w-4/12 relative"
 			>
 				<div class="flex justify-center items-center p-5 flex-col h-full overflow-y-auto">
 					<h1 class="text-2xl mt-14">
 						{registerVisible ? 'Créer un compte' : 'Se connecter'}
 					</h1>
 					<button
-						class="text-3xl absolute top-2 right-2 bg-purple-900 rounded-2xl px-1 py-1 text-white hover:bg-purple-800"
+						class="text-3xl absolute top-2 right-2 bg-blue-900 rounded-2xl px-1 py-1 text-white hover:bg-blue-800"
 						on:click={() => {
 							registerVisible = false;
 							loginVisible = false;
@@ -297,14 +308,14 @@
 							bind:value={username}
 							placeholder="Nom d'utilisateur"
 							autocomplete="off"
-							class="w-11/12 p-3 rounded-lg border-2 border-purple-800 focus:outline-none focus:border-purple-700"
+							class="w-11/12 p-3 rounded-lg border-2 border-blue-800 focus:outline-none focus:border-blue-700"
 						/>
 						<input
 							type="password"
 							bind:value={password}
 							placeholder="Mot de passe"
 							autocomplete="off"
-							class="w-11/12 p-3 rounded-lg border-2 border-purple-800 focus:outline-none focus:border-purple-700 mt-5"
+							class="w-11/12 p-3 rounded-lg border-2 border-blue-800 focus:outline-none focus:border-blue-700 mt-5"
 						/>
 						{#if registerVisible}
 							<input
@@ -312,13 +323,13 @@
 								bind:value={passwordConfirmation}
 								placeholder="Confirmer le mot de passe"
 								autocomplete="off"
-								class="w-11/12 p-3 rounded-lg border-2 border-purple-800 focus:outline-none focus:border-purple-700 mt-5"
+								class="w-11/12 p-3 rounded-lg border-2 border-blue-800 focus:outline-none focus:border-blue-700 mt-5"
 							/>
 						{/if}
 					</div>
 
 					<button
-						class="my-auto bg-purple-700 text-white p-3 rounded-lg shadow-lg hover:bg-purple-800 mt-5"
+						class="my-auto bg-blue-700 text-white p-3 rounded-lg shadow-lg hover:bg-blue-800 mt-5"
 						on:click={registerVisible ? register : login}
 					>
 						{registerVisible ? "S'enregistrer" : 'Se connecter'}
