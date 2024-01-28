@@ -4,12 +4,8 @@ import { sql } from '@vercel/postgres';
 export async function POST({ request }: { request: Request }) {
 	const form = await request.json();
 
-	console.log(form);
-
 	const groupName: string = form.groupName;
 	const creatorSecret: string = form.creatorSecret;
-
-	console.log(groupName, creatorSecret);
 
 	if (!groupName || !creatorSecret) {
 		return new Response(

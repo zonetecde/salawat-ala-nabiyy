@@ -21,8 +21,11 @@
 	});
 
 	onMount(() => {
-		if (localStorage.getItem('userId') && localStorage.getItem('username')) {
+		if (localStorage.getItem('userId')) {
 			userId.set(localStorage.getItem('userId')!);
+		}
+
+		if (localStorage.getItem('username')) {
 			username = localStorage.getItem('username')!;
 			isConnected = true;
 		}

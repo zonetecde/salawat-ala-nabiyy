@@ -1,7 +1,7 @@
 export default class GroupData {
 	constructor(
 		public code: string,
-		public somme: number,
+		public sommeTotal: number,
 		public sommeAujourdhui: number,
 		public nombreParticipantsAujourdhui: number,
 		public nombreParticipants: number,
@@ -10,12 +10,12 @@ export default class GroupData {
 		public objectifTotal: number
 	) {
 		this.code = code;
-		this.somme = somme;
-		this.sommeAujourdhui = sommeAujourdhui;
-		this.nombreParticipantsAujourdhui = nombreParticipantsAujourdhui;
-		this.nombreParticipants = nombreParticipants;
+		this.sommeTotal = Number(sommeTotal);
+		this.sommeAujourdhui = Number(sommeAujourdhui);
+		this.nombreParticipantsAujourdhui = Number(nombreParticipantsAujourdhui);
+		this.nombreParticipants = Number(nombreParticipants);
 		this.groupeName = groupeName;
-		this.objectifJournalier = objectifJournalier;
-		this.objectifTotal = objectifTotal;
+		this.objectifJournalier = Number(objectifJournalier);
+		this.objectifTotal = Number(objectifTotal);
 	}
 }
