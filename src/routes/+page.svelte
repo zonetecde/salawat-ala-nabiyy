@@ -31,7 +31,7 @@
 		}
 	});
 
-	function createGroup(event: MouseEvent & { currentTarget: EventTarget & HTMLButtonElement }) {
+	function createGroup() {
 		if (!groupData) {
 			toast.error('Veuillez entrer un nom de groupe');
 			return;
@@ -59,7 +59,7 @@
 			});
 	}
 
-	function joinGroup(event: MouseEvent & { currentTarget: EventTarget & HTMLButtonElement }) {
+	function joinGroup() {
 		if (!groupData) {
 			toast.error('Veuillez entrer un code de groupe');
 			return;
@@ -169,6 +169,20 @@
 				}
 			});
 	}
+
+	function keyPressLogin(e: KeyboardEvent & { currentTarget: EventTarget & HTMLInputElement }) {
+		if (e.key === 'Enter') {
+			registerVisible ? register() : login();
+		}
+	}
+
+	function groupInputKeyPressed(
+		e: KeyboardEvent & { currentTarget: EventTarget & HTMLInputElement }
+	) {
+		if (e.key === 'Enter') {
+			createGroupVisible ? createGroup() : joinGroup();
+		}
+	}
 </script>
 
 <div
@@ -258,6 +272,7 @@
 								placeholder={createGroupVisible ? 'Nom du groupe' : 'Code du groupe'}
 								autocomplete="off"
 								class="w-11/12 p-3 rounded-lg border-2 border-blue-800 focus:outline-none focus:border-blue-700"
+								on:keyup={groupInputKeyPressed}
 							/>
 						</div>
 
@@ -312,6 +327,7 @@
 							placeholder="Nom d'utilisateur"
 							autocomplete="off"
 							class="w-11/12 p-3 rounded-lg border-2 border-blue-800 focus:outline-none focus:border-blue-700"
+							on:keyup={keyPressLogin}
 						/>
 						<input
 							type="password"
@@ -319,6 +335,7 @@
 							placeholder="Mot de passe"
 							autocomplete="off"
 							class="w-11/12 p-3 rounded-lg border-2 border-blue-800 focus:outline-none focus:border-blue-700 mt-5"
+							on:keyup={keyPressLogin}
 						/>
 						{#if registerVisible}
 							<input
@@ -327,6 +344,7 @@
 								placeholder="Confirmer le mot de passe"
 								autocomplete="off"
 								class="w-11/12 p-3 rounded-lg border-2 border-blue-800 focus:outline-none focus:border-blue-700 mt-5"
+								on:keyup={keyPressLogin}
 							/>
 						{/if}
 					</div>
