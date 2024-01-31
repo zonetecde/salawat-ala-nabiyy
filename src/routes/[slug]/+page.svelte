@@ -86,12 +86,20 @@
 		}, 10);
 	}
 
+	let isRequesting = false;
+
 	function handleAddSalawat(
 		event: MouseEvent & { currentTarget: EventTarget & HTMLButtonElement }
 	) {
 		if (salawatInput < 1) {
 			return;
 		}
+
+		if (isRequesting) {
+			return;
+		}
+
+		isRequesting = true;
 
 		fetch('/api/add-salawat', {
 			method: 'POST',
@@ -117,6 +125,8 @@
 				} else {
 					toast.error("Une erreur s'est produite : " + res.message);
 				}
+
+				isRequesting = false;
 			});
 	}
 </script>
@@ -136,7 +146,7 @@
 				(page === 'Jour' ? 'bg-[#5e89c2]' : '')}
 			on:click={() => (page = 'Jour')}
 		>
-			<p>Jour</p>
+			<p>Aujourd'hui</p>
 		</button>
 		<div class="h-full border-r-2 border-blue-950" />
 		<button
@@ -152,7 +162,8 @@
 		class="bg-[#47849c] md:h-[50%] md:w-[20%] max-h-[400px] max-w-[200px] w-[40%] h-[35%] rounded-xl relative"
 	>
 		<div
-			class="bg-[#386874] duration-200 max-h-full absolute bottom-0 w-full rounded-xl"
+			class={'bg-[#386874] duration-200 max-h-full absolute bottom-0 w-full rounded-b-xl ' +
+				(progressionActuelle > 98 ? 'rounded-t-xl' : '')}
 			style={'height: ' + progressionActuelle + '%'}
 		></div>
 

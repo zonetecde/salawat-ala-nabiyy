@@ -225,7 +225,7 @@
 			transition:fly
 		>
 			<div
-				class="bg-blue-400 rounded-2xl border-4 border-blue-800 shadow-xl shadow-blue-400 h-3/5 lg:h-2/5 xl:h-[30%] w-11/12 md:w-8/12 lg:w-4/12 relative"
+				class="bg-blue-400 rounded-2xl border-4 border-blue-800 shadow-xl shadow-blue-400 h-3/5 min-h-[325px] lg:h-2/5 xl:h-[30%] w-11/12 md:w-8/12 lg:w-4/12 relative"
 			>
 				<div class="flex items-center justify-center p-5 flex-col h-full">
 					<button
