@@ -5,7 +5,7 @@
 	import { userId } from '../../store/store';
 	import toast from 'svelte-french-toast';
 	import '@carbon/charts-svelte/styles.css';
-	import { BarChartSimple, ScaleTypes, ChartTheme } from '@carbon/charts-svelte';
+	import { BarChartSimple, ScaleTypes, ChartTheme, Alignments } from '@carbon/charts-svelte';
 
 	/** @type {import('./$types').PageData} */
 	export let data: GroupData;
@@ -263,9 +263,20 @@
 		Ajouter des salawat
 	</button>
 
+	<!-- Affichage du "rank" de la personne si elle a déjà déposé au moins une salawat -->
+	{#if data.sommePersonnel > 0}
+		<p class="mt-5 text-base absolute bottom-5">
+			Vous êtes {data.rankPersonnel}<span style="font-variant-position: super;"
+				>{data.rankPersonnel === 1 ? 'er' : 'ème'}</span
+			>
+			au classement avec {data.sommePersonnel}
+			salawat
+		</p>
+	{/if}
+
 	{#if addSalawatVisible}
 		<div
-			class="bg-black bg-opacity-65 absolute inset-0 flex items-center justify-center"
+			class="bg-black bg-opacity-65 fixed inset-0 flex items-center justify-center z-40"
 			transition:fly
 		>
 			<div
@@ -318,7 +329,7 @@
 
 	{#if setObjectifVisible}
 		<div
-			class="bg-black bg-opacity-65 absolute inset-0 flex items-center justify-center"
+			class="bg-black bg-opacity-65 fixed inset-0 flex items-center justify-center z-40"
 			transition:fly
 		>
 			<div
@@ -368,6 +379,17 @@
 					</div>
 				</div>
 			</div>
+		</div>
+	{/if}
+
+	{#if data.code === undefined}
+		<div
+			class="bg-black bg-opacity-65 fixed inset-0 flex items-center justify-center z-40 flex-col pb-28"
+			transition:fly
+		>
+			<img src="spinner.svg" alt="spinner" class="w-60 md:w-[400px] animate-spin" />
+
+			<p class="text-white text-2xl font-bold -mt-5">Chargement des données...</p>
 		</div>
 	{/if}
 </div>
@@ -423,15 +445,18 @@
 		</tr>
 	</table>
 
-	<div class="md:w-[80%] w-[100%] mt-10 h-[400px]">
+	<div class="md:w-[80%] w-[100%] mt-10 h-[400px] z-10">
 		<BarChartSimple
 			data={data.jourNombre}
 			options={{
 				title: 'Graphique du nombre de salawat par jour',
 				theme: ChartTheme.G10,
 				axes: {
-					left: { mapsTo: 'nombre', scaleType: ScaleTypes.LINEAR },
+					left: { mapsTo: 'nombre', scaleType: ScaleTypes.LINEAR, title: 'Nombre de salawat' },
 					bottom: { mapsTo: 'date', scaleType: ScaleTypes.TIME }
+				},
+				legend: {
+					alignment: Alignments.RIGHT
 				}
 			}}
 		/>

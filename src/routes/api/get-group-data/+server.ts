@@ -10,7 +10,7 @@ export async function GET({ url }: { url: URL }) {
 	}
 
 	const code = url.searchParams.get('code')!;
-	const userSecret = url.searchParams.get('userSecret');
+	const userSecret = url.searchParams.get('userSecret') ?? '';
 
 	const groupeData = (await sql`SELECT * FROM groupes WHERE groupes.code = ${code}`).rows[0];
 
@@ -19,11 +19,14 @@ export async function GET({ url }: { url: URL }) {
 	const sommePersonnel: number =
 		(
 			await sql`SELECT SUM(nombre) FROM salawat WHERE salawat.groupe_code = ${code} AND salawat.user_secret = ${userSecret}`
-		).rows[0].sum ?? 0;
+		).rows[0].sum ?? -1;
 
-	const rankPersonnel: number = (
-		await sql`SELECT COUNT(*) FROM (SELECT DISTINCT user_secret, SUM(nombre) AS total FROM salawat WHERE salawat.groupe_code = ${code} GROUP BY user_secret) AS rank WHERE total > ${sommePersonnel}`
-	).rows[0].count;
+	const rankPersonnel: number =
+		Number(
+			(
+				await sql`SELECT COUNT(*) FROM (SELECT DISTINCT user_secret, SUM(nombre) AS total FROM salawat WHERE salawat.groupe_code = ${code} GROUP BY user_secret) AS rank WHERE total > ${sommePersonnel}`
+			).rows[0].count
+		) + 1;
 
 	const sommeTotal: number =
 		(await sql`SELECT SUM(nombre) FROM salawat WHERE salawat.groupe_code = ${code}`).rows[0].sum ??
