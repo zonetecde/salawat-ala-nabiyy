@@ -193,6 +193,15 @@
 	}
 </script>
 
+<svelte:head>
+	<title>Salawat 'ala Nabiyy</title>
+
+	<meta
+		name="description"
+		content="Créer des groupes de dhikr pour exprimer votre amour envers l'Élu, notre Maître Muhammad ﷺ"
+	/>
+</svelte:head>
+
 <div
 	class="h-screen w-screen bg-[#8faebd] p-5 text-center flex items-center justify-center relative"
 >
@@ -224,7 +233,7 @@
 	<div class="w-full flex justify-center items-center flex-col -mt-3 md:w-4/12">
 		<img src="salawat.png" alt="salawat" width="70%" />
 
-		<p>Que la paix et la bénédiction d'Allah soient sur notre Maitre Muhammad</p>
+		<p>Que la paix et la bénédiction d'Allah soient sur notre Maître Muhammad</p>
 
 		<button
 			class="mt-5 bg-blue-700 text-white p-3 rounded-lg shadow-lg hover:bg-blue-800"
