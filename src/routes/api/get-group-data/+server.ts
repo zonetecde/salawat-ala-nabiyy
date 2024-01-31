@@ -61,12 +61,12 @@ export async function GET({ url }: { url: URL }) {
 	).rows[0].max;
 
 	const res = (
-		await sql`SELECT DATE(salawat.date) AS date, SUM(nombre) AS nombre FROM salawat WHERE salawat.groupe_code = ${code} GROUP BY DATE(salawat.date)`
+		await sql`SELECT DATE(salawat.date) AS date, SUM(nombre) AS nombre FROM salawat WHERE salawat.groupe_code = ${code} GROUP BY DATE(salawat.date) ORDER BY (DATE(salawat.date)) ASC`
 	).rows;
 
-	const jourNombre: { date: string; nombre: number }[] = [];
+	const jourNombre: { date: Date; nombre: number }[] = [];
 	res.forEach((row) => {
-		jourNombre.push({ date: row.date, nombre: row.nombre });
+		jourNombre.push({ date: new Date(row.date.toISOString()), nombre: row.nombre });
 	});
 
 	return new Response(

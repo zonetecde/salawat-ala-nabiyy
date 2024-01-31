@@ -15,7 +15,7 @@ export default class GroupData {
 		public nombreJoursAvecSalawat: number,
 		public moyenneJour: number,
 		public recordJournee: number,
-		public jourNombre: { date: string; nombre: number }[]
+		public jourNombre: { date: Date; nombre: number }[]
 	) {
 		this.code = code;
 		this.sommeTotal = Number(sommeTotal);

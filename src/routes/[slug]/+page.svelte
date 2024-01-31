@@ -4,6 +4,8 @@
 	import { fly } from 'svelte/transition';
 	import { userId } from '../../store/store';
 	import toast from 'svelte-french-toast';
+	import '@carbon/charts-svelte/styles.css';
+	import { BarChartSimple, ScaleTypes, ChartTheme } from '@carbon/charts-svelte';
 
 	/** @type {import('./$types').PageData} */
 	export let data: GroupData;
@@ -136,7 +138,7 @@
 </svelte:head>
 
 <div
-	class="h-screen w-screen bg-[#8faebd] p-5 text-center flex items-center justify-center relative flex-col"
+	class="h-screen bg-[#8faebd] p-5 text-center flex items-center justify-center relative flex-col"
 >
 	<div
 		class="absolute top-0 left-0 right-0 h-12 bg-[#7999b3] text-blue-950 flex flex-row items-center text-2xl border-b-2 border-blue-950"
@@ -290,6 +292,17 @@
 		</tr>
 	</table>
 
-	<!-- Graphique du nombre de salawat (groupeData.jourNombre est une liste d'object contenant pour chaque .date le .nombre de salawat associé ) -->
-	<div id="chart" class="mt-5 w-[90%] h-44"></div>
+	<div class="w-[80%] mt-10 h-[400px]">
+		<BarChartSimple
+			data={data.jourNombre}
+			options={{
+				title: 'Graphique du nombre de salawat par jour',
+				theme: ChartTheme.G10,
+				axes: {
+					left: { mapsTo: 'nombre', scaleType: ScaleTypes.LINEAR },
+					bottom: { mapsTo: 'date', scaleType: ScaleTypes.TIME }
+				}
+			}}
+		/>
+	</div>
 </div>
