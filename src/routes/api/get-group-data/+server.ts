@@ -10,8 +10,20 @@ export async function GET({ url }: { url: URL }) {
 	}
 
 	const code = url.searchParams.get('code')!;
+	const userSecret = url.searchParams.get('userSecret');
 
 	const groupeData = (await sql`SELECT * FROM groupes WHERE groupes.code = ${code}`).rows[0];
+
+	const adminSecret = groupeData.creator_secret;
+
+	const sommePersonnel: number =
+		(
+			await sql`SELECT SUM(nombre) FROM salawat WHERE salawat.groupe_code = ${code} AND salawat.user_secret = ${userSecret}`
+		).rows[0].sum ?? 0;
+
+	const rankPersonnel: number = (
+		await sql`SELECT COUNT(*) FROM (SELECT DISTINCT user_secret, SUM(nombre) AS total FROM salawat WHERE salawat.groupe_code = ${code} GROUP BY user_secret) AS rank WHERE total > ${sommePersonnel}`
+	).rows[0].count;
 
 	const sommeTotal: number =
 		(await sql`SELECT SUM(nombre) FROM salawat WHERE salawat.groupe_code = ${code}`).rows[0].sum ??
@@ -73,6 +85,9 @@ export async function GET({ url }: { url: URL }) {
 		JSON.stringify(
 			new GroupData(
 				code,
+				adminSecret,
+				sommePersonnel,
+				rankPersonnel,
 				sommeTotal,
 				sommeAujourdhui,
 				nombreParticipantsAujourdhui,

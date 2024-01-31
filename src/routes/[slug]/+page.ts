@@ -1,4 +1,5 @@
 import { error } from '@sveltejs/kit';
+import { userId } from '../../store/store';
 
 /** @type {import('./$types').PageLoad} */
 export async function load({ params, fetch }) {
@@ -11,8 +12,18 @@ export async function load({ params, fetch }) {
 	}
 
 	// Récupère les données du groupe
+	let userSecretValue = '';
 
-	const reponseGroupData = await fetch(`/api/get-group-data?code=${params.slug}`);
+	userId.subscribe((value) => {
+		userSecretValue = value;
+		console.log(value);
+	});
+
+	console.log(userSecretValue);
+
+	const reponseGroupData = await fetch(
+		`/api/get-group-data?code=${params.slug}&userSecret=${userSecretValue}`
+	);
 
 	return await reponseGroupData.json();
 }

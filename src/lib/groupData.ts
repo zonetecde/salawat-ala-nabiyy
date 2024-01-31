@@ -1,6 +1,9 @@
 export default class GroupData {
 	constructor(
 		public code: string,
+		public adminSecret: string,
+		public sommePersonnel: number,
+		public rankPersonnel: number,
 		public sommeTotal: number,
 		public sommeAujourdhui: number,
 		public nombreParticipantsAujourdhui: number,
@@ -18,6 +21,7 @@ export default class GroupData {
 		public jourNombre: { date: Date; nombre: number }[]
 	) {
 		this.code = code;
+		this.adminSecret = adminSecret;
 		this.sommeTotal = Number(sommeTotal);
 		this.sommeAujourdhui = Number(sommeAujourdhui);
 		this.nombreParticipantsAujourdhui = Number(nombreParticipantsAujourdhui);
