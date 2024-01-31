@@ -4,6 +4,8 @@
 	import { fly } from 'svelte/transition';
 	import { userId } from '../../store/store';
 	import toast from 'svelte-french-toast';
+	import '@carbon/charts-svelte/styles.css';
+	import { BarChartSimple, ScaleTypes, ChartTheme } from '@carbon/charts-svelte';
 
 	/** @type {import('./$types').PageData} */
 	export let data: GroupData;
@@ -86,12 +88,20 @@
 		}, 10);
 	}
 
+	let isRequesting = false;
+
 	function handleAddSalawat(
 		event: MouseEvent & { currentTarget: EventTarget & HTMLButtonElement }
 	) {
 		if (salawatInput < 1) {
 			return;
 		}
+
+		if (isRequesting) {
+			return;
+		}
+
+		isRequesting = true;
 
 		fetch('/api/add-salawat', {
 			method: 'POST',
@@ -117,6 +127,8 @@
 				} else {
 					toast.error("Une erreur s'est produite : " + res.message);
 				}
+
+				isRequesting = false;
 			});
 	}
 </script>
@@ -126,21 +138,21 @@
 </svelte:head>
 
 <div
-	class="h-screen w-screen bg-[#8faebd] p-5 text-center flex items-center justify-center relative flex-col"
+	class="h-screen bg-[#8faebd] p-5 text-center flex items-center justify-center relative flex-col"
 >
 	<div
 		class="absolute top-0 left-0 right-0 h-12 bg-[#7999b3] text-blue-950 flex flex-row items-center text-2xl border-b-2 border-blue-950"
 	>
 		<button
-			class={'w-[50%] h-full flex items-center justify-center duration-150 ' +
+			class={'w-[50%] h-full flex items-center justify-center duration-150 outline-none ' +
 				(page === 'Jour' ? 'bg-[#5e89c2]' : '')}
 			on:click={() => (page = 'Jour')}
 		>
-			<p>Jour</p>
+			<p>Aujourd'hui</p>
 		</button>
 		<div class="h-full border-r-2 border-blue-950" />
 		<button
-			class={'w-[50%] h-full flex items-center justify-center duration-150 ' +
+			class={'w-[50%] h-full flex items-center justify-center duration-150 outline-none ' +
 				(page === 'Total' ? 'bg-[#5e89c2]' : '')}
 			on:click={() => (page = 'Total')}
 		>
@@ -148,11 +160,14 @@
 		</button>
 	</div>
 
+	<!-- BARRE DE PROGRESSION -->
+
 	<div
-		class="bg-[#47849c] md:h-[50%] md:w-[20%] max-h-[400px] max-w-[200px] w-[40%] h-[35%] rounded-xl relative"
+		class="bg-[#47849c] md:h-[50%] md:w-[20%] max-h-[400px] max-w-[200px] w-[40%] h-[35%] rounded-xl relative mt-14"
 	>
 		<div
-			class="bg-[#386874] duration-200 max-h-full absolute bottom-0 w-full rounded-xl"
+			class={'bg-[#386874] duration-200 max-h-full absolute bottom-0 w-full rounded-b-xl ' +
+				(progressionActuelle > 98 ? 'rounded-t-xl' : '')}
 			style={'height: ' + progressionActuelle + '%'}
 		></div>
 
@@ -225,4 +240,69 @@
 			</div>
 		</div>
 	{/if}
+</div>
+
+<!-- Informations complémentaire -->
+
+<div class="bg-[#7999b3] text-blue-950 flex flex-col items-center justify-center p-5">
+	<p class="text-xl font-bold text-center">Informations complémentaires</p>
+
+	<table class="mt-5 border border-black">
+		<tr class="border-b border-black">
+			<td class="w-[75%] pl-2 py-1">Nombre de membres ayant participé aujourd'hui :</td>
+			<td>{data.nombreParticipantsAujourdhui}</td>
+		</tr>
+		<tr class="border-b border-black">
+			<td class="w-[75%] pl-2 py-1">Nombre de membres ayant participé (total) :</td>
+			<td>{data.nombreParticipants}</td>
+		</tr>
+
+		<tr class="border-b border-black">
+			<td class="w-[75%] pl-2 py-1">Nombre de salawat ces 7 derniers jours :</td>
+			<td>{data.somme7derniersJours}</td>
+		</tr>
+
+		<tr class="border-b border-black">
+			<td class="w-[75%] pl-2 py-1">Nombre de salawat ces 30 derniers jours :</td>
+			<td>{data.somme30derniersJours}</td>
+		</tr>
+
+		<tr class="border-b border-black">
+			<td class="w-[75%] pl-2 py-1">Nombre de salawat ces 365 derniers jours :</td>
+			<td>{data.somme365derniersJours}</td>
+		</tr>
+
+		<tr class="border-b border-black">
+			<td class="w-[75%] pl-2 py-1">Nombre de salawat par personne en moyenne :</td>
+			<td>{data.moyenneParticipant}</td>
+		</tr>
+
+		<tr class="border-b border-black">
+			<td class="w-[75%] pl-2 py-1">Nombre de salawat par jour en moyenne :</td>
+			<td>{data.moyenneJour}</td>
+		</tr>
+
+		<tr class="border-b border-black">
+			<td class="w-[75%] pl-2 py-1">Nombre de jour actif du groupe :</td>
+			<td>{data.nombreJoursAvecSalawat}</td>
+		</tr>
+		<tr class="border-b border-black">
+			<td class="w-[75%] pl-2 py-1">Record en une journée :</td>
+			<td>{data.recordJournee}</td>
+		</tr>
+	</table>
+
+	<div class="w-[80%] mt-10 h-[400px]">
+		<BarChartSimple
+			data={data.jourNombre}
+			options={{
+				title: 'Graphique du nombre de salawat par jour',
+				theme: ChartTheme.G10,
+				axes: {
+					left: { mapsTo: 'nombre', scaleType: ScaleTypes.LINEAR },
+					bottom: { mapsTo: 'date', scaleType: ScaleTypes.TIME }
+				}
+			}}
+		/>
+	</div>
 </div>
