@@ -1,6 +1,7 @@
 import { error } from '@sveltejs/kit';
 import { userId } from '../../store/store';
 import { browser } from '$app/environment';
+import GroupData from '$lib/groupData';
 
 /** @type {import('./$types').PageLoad} */
 export async function load({ params, fetch }) {
@@ -14,7 +15,7 @@ export async function load({ params, fetch }) {
 		}
 
 		// Récupère les données du groupe
-		let userSecretValue = localStorage.getItem('userId');
+		let userSecretValue = localStorage.getItem('userId') ?? '';
 
 		const reponseGroupData = await fetch(
 			`/api/get-group-data?code=${params.slug}&userSecret=${userSecretValue}`

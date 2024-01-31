@@ -54,13 +54,14 @@ export async function GET({ url }: { url: URL }) {
 
 	const moyenneParticipant: number =
 		sommeTotal /
-		(await sql`SELECT COUNT(*) FROM salawat WHERE salawat.groupe_code = ${code}`).rows[0].count;
+			(await sql`SELECT COUNT(*) FROM salawat WHERE salawat.groupe_code = ${code}`).rows[0].count ||
+		0;
 
 	const nombreJoursAvecSalawat = (
 		await sql`SELECT COUNT(DISTINCT DATE(salawat.date)) FROM salawat WHERE salawat.groupe_code = ${code}`
 	).rows[0].count;
 
-	const moyenneJour = sommeTotal / nombreJoursAvecSalawat;
+	const moyenneJour = sommeTotal / nombreJoursAvecSalawat || 0;
 
 	const nombreParticipantsAujourdhui: number =
 		(
@@ -83,6 +84,8 @@ export async function GET({ url }: { url: URL }) {
 	res.forEach((row) => {
 		jourNombre.push({ date: new Date(row.date.toISOString()), nombre: row.nombre });
 	});
+
+	console.log(moyenneParticipant);
 
 	return new Response(
 		JSON.stringify(

@@ -6,6 +6,7 @@
 	import toast from 'svelte-french-toast';
 	import '@carbon/charts-svelte/styles.css';
 	import { BarChartSimple, ScaleTypes, ChartTheme, Alignments } from '@carbon/charts-svelte';
+	import { browser } from '$app/environment';
 
 	/** @type {import('./$types').PageData} */
 	export let data: GroupData;
@@ -123,7 +124,7 @@
 			body: JSON.stringify({ code: data.code, salawat: salawatInput, userSecret: userSecretValue })
 		})
 			.then((res) => res.json())
-			.then((res) => {
+			.then(async (res) => {
 				if (res.success) {
 					toast.success('Salawat ajoutées avec succès');
 
@@ -136,6 +137,13 @@
 
 					// on ferme la fenêtre
 					addSalawatVisible = false;
+
+					// met à jour les datas
+					const reponseGroupData = await fetch(
+						`/api/get-group-data?code=${data.code}&userSecret=${userSecretValue}`
+					);
+
+					data = await reponseGroupData.json();
 				} else {
 					toast.error("Une erreur s'est produite : " + res.message);
 				}
@@ -231,6 +239,17 @@
 		</button>
 	</div>
 
+	{#if browser && localStorage.getItem('userId') === null}
+		<div class="absolute flex flex-col text-center text-slate-800 top-14">
+			<span>
+				<a href="/?login" class="hover:underline">Connectez-vous</a> ou
+				<a href="/?register" class="hover:underline">créez un compte</a>
+			</span>
+
+			<p class="text-sm">pour ajouter des salawat</p>
+		</div>
+	{/if}
+
 	<!-- BARRE DE PROGRESSION -->
 
 	<div
@@ -238,9 +257,9 @@
 			(progressionActuelle < 5 ? 'rounded-b-none' : '')}
 	>
 		<div
-			class={'bg-[#386874] duration-200 max-h-full absolute bottom-0 w-full rounded-b-xl ' +
-				(progressionActuelle > 98 ? 'rounded-t-xl ' : '') +
-				(progressionActuelle < 5 ? ' rounded-b-none' : '')}
+			class={'bg-[#386874] duration-200 max-h-full absolute bottom-0 w-full ' +
+				(progressionActuelle > 98 ? 'rounded-t-xl ' : ' ') +
+				(progressionActuelle < 5 ? ' rounded-b-none' : 'rounded-b-xl')}
 			style={'height: ' + progressionActuelle + '%'}
 		></div>
 
@@ -253,7 +272,7 @@
 
 	<p class="mt-12 text-4xl font-bold">{Math.floor(salawatAujourdhui)} salawat</p>
 	<button on:click={handleChangeObjectif}
-		>Objectif {page === 'Jour' ? 'journalier' : 'total'} : {objectif}</button
+		>Objectif {page === 'Jour' ? 'journalier' : 'total'} : {objectif ?? 0}</button
 	>
 
 	<button
@@ -403,45 +422,45 @@
 	<table class="mt-5 border border-black">
 		<tr class="border-b border-black">
 			<td class="w-[75%] pl-2 py-1">Nombre de membres ayant participé aujourd'hui :</td>
-			<td>{data.nombreParticipantsAujourdhui}</td>
+			<td>{data.nombreParticipantsAujourdhui ?? 0}</td>
 		</tr>
 		<tr class="border-b border-black">
 			<td class="w-[75%] pl-2 py-1">Nombre de membres ayant participé (total) :</td>
-			<td>{data.nombreParticipants}</td>
+			<td>{data.nombreParticipants ?? 0}</td>
 		</tr>
 
 		<tr class="border-b border-black">
 			<td class="w-[75%] pl-2 py-1">Nombre de salawat ces 7 derniers jours :</td>
-			<td>{data.somme7derniersJours}</td>
+			<td>{data.somme7derniersJours ?? 0}</td>
 		</tr>
 
 		<tr class="border-b border-black">
 			<td class="w-[75%] pl-2 py-1">Nombre de salawat ces 30 derniers jours :</td>
-			<td>{data.somme30derniersJours}</td>
+			<td>{data.somme30derniersJours ?? 0}</td>
 		</tr>
 
 		<tr class="border-b border-black">
 			<td class="w-[75%] pl-2 py-1">Nombre de salawat ces 365 derniers jours :</td>
-			<td>{data.somme365derniersJours}</td>
+			<td>{data.somme365derniersJours ?? 0}</td>
 		</tr>
 
 		<tr class="border-b border-black">
 			<td class="w-[75%] pl-2 py-1">Nombre de salawat par personne en moyenne :</td>
-			<td>{data.moyenneParticipant}</td>
+			<td>{data.moyenneParticipant ?? 0}</td>
 		</tr>
 
 		<tr class="border-b border-black">
 			<td class="w-[75%] pl-2 py-1">Nombre de salawat par jour en moyenne :</td>
-			<td>{data.moyenneJour}</td>
+			<td>{data.moyenneJour ?? 0}</td>
 		</tr>
 
 		<tr class="border-b border-black">
 			<td class="w-[75%] pl-2 py-1">Nombre de jour actif du groupe :</td>
-			<td>{data.nombreJoursAvecSalawat}</td>
+			<td>{data.nombreJoursAvecSalawat ?? 0}</td>
 		</tr>
 		<tr class="border-b border-black">
 			<td class="w-[75%] pl-2 py-1">Record en une journée :</td>
-			<td>{data.recordJournee}</td>
+			<td>{data.recordJournee ?? 0}</td>
 		</tr>
 	</table>
 
@@ -452,13 +471,35 @@
 				title: 'Graphique du nombre de salawat par jour',
 				theme: ChartTheme.G10,
 				axes: {
-					left: { mapsTo: 'nombre', scaleType: ScaleTypes.LINEAR, title: 'Nombre de salawat' },
+					left: {
+						mapsTo: 'nombre',
+						scaleType: ScaleTypes.LINEAR
+					},
 					bottom: { mapsTo: 'date', scaleType: ScaleTypes.TIME }
 				},
 				legend: {
-					alignment: Alignments.RIGHT
+					alignment: Alignments.RIGHT,
+					enabled: false
 				}
 			}}
 		/>
 	</div>
+
+	{#if browser && localStorage.getItem('userId')}
+		<p class="text-black mt-3">Connecté en tant que {localStorage.getItem('username')}</p>
+		<button
+			class="hover:underline text-black"
+			on:click={() => {
+				localStorage.removeItem('userId');
+				localStorage.removeItem('username');
+				userId.set('');
+				window.location.reload();
+			}}
+		>
+			Se déconnecter
+		</button>
+	{:else}
+		<a href="/?login" class="hover:underline text-black mt-3">Se connecter</a>
+		<a href="/?register" class="hover:underline text-black">Créer un compte</a>
+	{/if}
 </div>

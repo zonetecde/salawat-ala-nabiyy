@@ -29,6 +29,14 @@
 			username = localStorage.getItem('username')!;
 			isConnected = true;
 		}
+
+		// récupère l'url pour savoir si on doit afficher le formulaire de connexion ou d'inscription
+		const url = window.location.href;
+		if (url.includes('login')) {
+			loginVisible = true;
+		} else if (url.includes('register')) {
+			registerVisible = true;
+		}
 	});
 
 	function createGroup() {
@@ -190,9 +198,11 @@
 >
 	{#if !isConnected}
 		<div class="absolute top-2 md:top-8 flex justify-center gap-x-2">
-			<button on:click={() => (registerVisible = true)}>Créer un compte</button>
+			<button on:click={() => (registerVisible = true)} class="hover:underline"
+				>Créer un compte</button
+			>
 			<p>•</p>
-			<button on:click={() => (loginVisible = true)}>Se connecter</button>
+			<button on:click={() => (loginVisible = true)} class="hover:underline">Se connecter</button>
 		</div>
 	{:else}
 		<div class="absolute top-2 md:top-8 flex flex-col justify-center gap-x-2">
