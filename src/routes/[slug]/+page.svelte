@@ -240,7 +240,7 @@
 	</div>
 
 	{#if browser && localStorage.getItem('userId') === null}
-		<div class="absolute flex flex-col text-center text-slate-800 right-4 text-right top-14">
+		<div class="absolute flex flex-col text-slate-800 right-4 text-right top-14">
 			<span>
 				<a href="/?login" class="hover:underline">Connectez-vous</a> ou
 				<a href="/?register" class="hover:underline">créez un compte</a>
