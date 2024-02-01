@@ -287,7 +287,7 @@
 
 	<!-- Affichage du "rank" de la personne si elle a déjà déposé au moins une salawat -->
 	{#if data.sommePersonnel > 0}
-		<p class="px-1.5 mt-5 text-base absolute bottom-1.5 md:bottom-5">
+		<p class="px-1.5 mt-5 text-base absolute bottom-1.5">
 			Vous êtes {data.rankPersonnel}<span style="font-variant-position: super;"
 				>{data.rankPersonnel === 1 ? 'er' : 'ème'}</span
 			>
