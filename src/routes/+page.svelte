@@ -50,6 +50,9 @@
 			return;
 		}
 
+		// trim groupData
+		groupData = groupData.trim();
+
 		fetch('/api/create-group', {
 			method: 'POST',
 			headers: {
@@ -122,6 +125,9 @@
 			return;
 		}
 
+		// trim username
+		username = username.trim();
+
 		fetch('/api/register', {
 			method: 'POST',
 			headers: {
@@ -152,6 +158,9 @@
 			toast.error('Veuillez remplir tous les champs');
 			return;
 		}
+
+		// trim username
+		username = username.trim();
 
 		fetch('/api/login', {
 			method: 'POST',
